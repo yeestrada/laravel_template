@@ -1,0 +1,240 @@
+/**
+ * EquiForge Design System - Color Scales & Typography
+ * Use via CSS variables (var(--ef-*)) or Tailwind classes (primary-500, danger-600, etc.)
+ */
+
+:root {
+  /* Primary (purple-pink) - Base #815374 */
+  --ef-primary-100: #f3eef2;
+  --ef-primary-200: #cdbac7;
+  --ef-primary-300: #b398ac;
+  --ef-primary-400: #9a7590;
+  --ef-primary-500: #815374;
+  --ef-primary-600: #67425d;
+  --ef-primary-700: #4d3246;
+  --ef-primary-800: #34212e;
+
+  /* Secondary (teal) - Base #4D868E */
+  --ef-secondary-100: #dbe7e8;
+  --ef-secondary-200: #b8cfd2;
+  --ef-secondary-300: #94b6bb;
+  --ef-secondary-400: #719ea5;
+  --ef-secondary-500: #4d868e;
+  --ef-secondary-600: #3e6b72;
+  --ef-secondary-700: #2e5055;
+  --ef-secondary-800: #1f3639;
+
+  /* Success (green) - Base #4EA685 */
+  --ef-success-100: #dcede7;
+  --ef-success-200: #b8dbce;
+  --ef-success-300: #95cab6;
+  --ef-success-400: #71b89d;
+  --ef-success-500: #4ea685;
+  --ef-success-600: #3e856a;
+  --ef-success-700: #2f6450;
+  --ef-success-800: #1f4235;
+
+  /* Warning (yellow-orange) - Base #FFC627 */
+  --ef-warning-100: #fff4d4;
+  --ef-warning-200: #ffe8a9;
+  --ef-warning-300: #ffdd7d;
+  --ef-warning-400: #ffd152;
+  --ef-warning-500: #ffc627;
+  --ef-warning-600: #cc9e1f;
+  --ef-warning-700: #997717;
+  --ef-warning-800: #664f10;
+
+  /* Danger (red) - Base #B82020 */
+  --ef-danger-100: #f8e9e9;
+  --ef-danger-200: #e3a6a6;
+  --ef-danger-300: #d47979;
+  --ef-danger-400: #c64d4d;
+  --ef-danger-500: #b82020;
+  --ef-danger-600: #931a1a;
+  --ef-danger-700: #6e1313;
+  --ef-danger-800: #4a0d0d;
+
+  /* Info (blue) - Base #0284C7 */
+  --ef-info-100: #e6f3fa;
+  --ef-info-200: #9acee9;
+  --ef-info-300: #67b5dd;
+  --ef-info-400: #359dd2;
+  --ef-info-500: #0284c7;
+  --ef-info-600: #026a9f;
+  --ef-info-700: #014f77;
+  --ef-info-800: #013550;
+
+  /* Black (grayscale) - Base #0A0203 */
+  --ef-black-100: #e7e6e6;
+  --ef-black-200: #9d9a9a;
+  --ef-black-300: #6c6768;
+  --ef-black-400: #3b3535;
+  --ef-black-500: #0a0203;
+
+  /* Custom */
+  --ef-custom-silver: #a7a7a7;
+  --ef-custom-neutral: #fff8f3;
+
+  /* Typography - Poppins (EquiForge tokens) */
+  --ef-font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --ef-text-color: #0a0203;
+  --ef-text-inverse: #ffffff;
+  --ef-font-weight-light: 300;
+  --ef-font-weight-regular: 400;
+  --ef-font-weight-medium: 500;
+  --ef-font-weight-semibold: 600;
+  --ef-font-weight-bold: 700;
+
+  /* Headings */
+  --ef-h1-size: 48px;
+  --ef-h1-height: 54px;
+  --ef-h1-weight: 300;
+  --ef-h1-spacing: 0;
+
+  --ef-h2-size: 40px;
+  --ef-h2-height: 48px;
+  --ef-h2-weight: 300;
+  --ef-h2-spacing: 0.03em;
+
+  --ef-h3-size: 32px;
+  --ef-h3-height: 40px;
+  --ef-h3-weight: 300;
+  --ef-h3-spacing: 0.02em;
+
+  --ef-h4-size: 32px;
+  --ef-h4-height: 40px;
+  --ef-h4-weight: 700;
+  --ef-h4-spacing: 0.02em;
+
+  --ef-h5-size: 28px;
+  --ef-h5-height: 36px;
+  --ef-h5-weight: 700;
+  --ef-h5-spacing: 0.02em;
+
+  --ef-h6-size: 24px;
+  --ef-h6-height: 30px;
+  --ef-h6-weight: 700;
+  --ef-h6-spacing: 0.03em;
+
+  /* Body & UI */
+  --ef-p-size: 16px;
+  --ef-p-height: 22px;
+  --ef-p-weight: 300;
+  --ef-p-spacing: 0.05em;
+
+  --ef-label-size: 14px;
+  --ef-label-height: 18px;
+  --ef-label-weight: 500;
+  --ef-label-spacing: 0.05em;
+
+  --ef-small-size: 12px;
+  --ef-small-height: 16px;
+  --ef-small-weight: 300;
+  --ef-small-spacing: 0.05em;
+
+  --ef-xsmall-size: 10px;
+  --ef-xsmall-height: 14px;
+  --ef-xsmall-weight: 400;
+  --ef-xsmall-spacing: 0.05em;
+}
+
+/* EquiForge Typography - base styles (optional: apply on a wrapper with .ef-typography) */
+.ef-typography h1,
+.ef-type-h1 {
+  font-family: var(--ef-font-family);
+  font-weight: var(--ef-h1-weight);
+  font-size: var(--ef-h1-size);
+  line-height: var(--ef-h1-height);
+  letter-spacing: var(--ef-h1-spacing);
+  color: var(--ef-text-color);
+}
+
+.ef-typography h2,
+.ef-type-h2 {
+  font-family: var(--ef-font-family);
+  font-weight: var(--ef-h2-weight);
+  font-size: var(--ef-h2-size);
+  line-height: var(--ef-h2-height);
+  letter-spacing: var(--ef-h2-spacing);
+  color: var(--ef-text-color);
+}
+
+.ef-typography h3,
+.ef-type-h3 {
+  font-family: var(--ef-font-family);
+  font-weight: var(--ef-h3-weight);
+  font-size: var(--ef-h3-size);
+  line-height: var(--ef-h3-height);
+  letter-spacing: var(--ef-h3-spacing);
+  color: var(--ef-text-color);
+}
+
+.ef-typography h4,
+.ef-type-h4 {
+  font-family: var(--ef-font-family);
+  font-weight: var(--ef-h4-weight);
+  font-size: var(--ef-h4-size);
+  line-height: var(--ef-h4-height);
+  letter-spacing: var(--ef-h4-spacing);
+  color: var(--ef-text-color);
+}
+
+.ef-typography h5,
+.ef-type-h5 {
+  font-family: var(--ef-font-family);
+  font-weight: var(--ef-h5-weight);
+  font-size: var(--ef-h5-size);
+  line-height: var(--ef-h5-height);
+  letter-spacing: var(--ef-h5-spacing);
+  color: var(--ef-text-color);
+}
+
+.ef-typography h6,
+.ef-type-h6 {
+  font-family: var(--ef-font-family);
+  font-weight: var(--ef-h6-weight);
+  font-size: var(--ef-h6-size);
+  line-height: var(--ef-h6-height);
+  letter-spacing: var(--ef-h6-spacing);
+  color: var(--ef-text-color);
+}
+
+.ef-typography p,
+.ef-type-p {
+  font-family: var(--ef-font-family);
+  font-weight: var(--ef-p-weight);
+  font-size: var(--ef-p-size);
+  line-height: var(--ef-p-height);
+  letter-spacing: var(--ef-p-spacing);
+  color: var(--ef-text-color);
+}
+
+.ef-typography label,
+.ef-type-label {
+  font-family: var(--ef-font-family);
+  font-weight: var(--ef-label-weight);
+  font-size: var(--ef-label-size);
+  line-height: var(--ef-label-height);
+  letter-spacing: var(--ef-label-spacing);
+  color: var(--ef-text-color);
+}
+
+.ef-typography .small,
+.ef-type-small {
+  font-family: var(--ef-font-family);
+  font-weight: var(--ef-small-weight);
+  font-size: var(--ef-small-size);
+  line-height: var(--ef-small-height);
+  letter-spacing: var(--ef-small-spacing);
+  color: var(--ef-text-color);
+}
+
+.ef-typography .xsmall,
+.ef-type-xsmall {
+  font-family: var(--ef-font-family);
+  font-weight: var(--ef-xsmall-weight);
+  font-size: var(--ef-xsmall-size);
+  line-height: var(--ef-xsmall-height);
+  letter-spacing: var(--ef-xsmall-spacing);
+  color: var(--ef-text-color);
+}

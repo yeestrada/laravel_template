@@ -2,7 +2,7 @@
 
 # Laravel Template — API + Auth + PostgreSQL + React
 
-Base template with **Laravel**, **API authentication (Laravel Sanctum)**, **REST API**, **PostgreSQL**, and **React frontend** (Laravel Breeze + Inertia.js).
+Base template with **Laravel**, **API authentication (Laravel Sanctum)**, **REST API**, **PostgreSQL**, and **React frontend** (Laravel Breeze + Inertia.js). Optional **Sign in with Microsoft** (Azure Entra ID) when `MICROSOFT_CLIENT_ID` and `MICROSOFT_CLIENT_SECRET` are set in `.env`.
 
 ## Requirements
 

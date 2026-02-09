@@ -1,16 +1,22 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
-import LanguageSwitcher from '@/Components/LanguageSwitcher';
+import LanguageSelector from '@/Components/LanguageSelector';
 import NavLink from '@/Components/NavLink';
+import ProfileModalContent from '@/Pages/Profile/Partials/ProfileModalContent';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function AuthenticatedLayout({ header, children }) {
-    const user = usePage().props.auth.user;
+    const { auth, translations = {}, mustVerifyEmail, profileStatus, openProfileModal } = usePage().props;
+    const user = auth.user;
+    const t = (key) => translations[key] ?? key;
 
-    const [showingNavigationDropdown, setShowingNavigationDropdown] =
-        useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const [showProfileModal, setShowProfileModal] = useState(false);
+
+    useEffect(() => {
+        if (openProfileModal) setShowProfileModal(true);
+    }, [openProfileModal]);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -19,8 +25,12 @@ export default function AuthenticatedLayout({ header, children }) {
                     <div className="flex h-16 justify-between">
                         <div className="flex">
                             <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
+                                <Link href="/" className="block">
+                                    <img
+                                        src="/images/WEC_Horsehead_Only_Black.png"
+                                        alt=""
+                                        className="block h-9 w-auto object-contain"
+                                    />
                                 </Link>
                             </div>
 
@@ -29,13 +39,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                     href={route('dashboard')}
                                     active={route().current('dashboard')}
                                 >
-                                    Dashboard
+                                    {t('Dashboard')}
                                 </NavLink>
                             </div>
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center sm:gap-4">
-                            <LanguageSwitcher />
+                            <LanguageSelector buttonClass="border border-gray-200" />
                             <div className="relative ms-3">
                                 <Dropdown>
                                     <Dropdown.Trigger>
@@ -63,17 +73,19 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </Dropdown.Trigger>
 
                                     <Dropdown.Content>
-                                        <Dropdown.Link
-                                            href={route('profile.edit')}
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowProfileModal(true)}
+                                            className="block w-full px-4 py-2 text-start text-sm leading-5 text-gray-700 transition duration-150 ease-in-out hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
                                         >
-                                            Profile
-                                        </Dropdown.Link>
+                                            {t('Profile')}
+                                        </button>
                                         <Dropdown.Link
                                             href={route('logout')}
                                             method="post"
                                             as="button"
                                         >
-                                            Log Out
+                                            {t('Log out')}
                                         </Dropdown.Link>
                                     </Dropdown.Content>
                                 </Dropdown>
@@ -134,12 +146,14 @@ export default function AuthenticatedLayout({ header, children }) {
                             href={route('dashboard')}
                             active={route().current('dashboard')}
                         >
-                            Dashboard
+                            {t('Dashboard')}
                         </ResponsiveNavLink>
                     </div>
 
                     <div className="border-t border-gray-200 px-4 pb-1 pt-4">
-                        <LanguageSwitcher className="mb-3" />
+                        <div className="mb-3">
+                                <LanguageSelector buttonClass="border border-gray-200" />
+                            </div>
                         <div className="px-0">
                             <div className="text-base font-medium text-gray-800">
                                 {user.name}
@@ -150,15 +164,19 @@ export default function AuthenticatedLayout({ header, children }) {
                         </div>
 
                         <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>
-                                Profile
-                            </ResponsiveNavLink>
+                            <button
+                                type="button"
+                                onClick={() => { setShowProfileModal(true); setShowingNavigationDropdown(false); }}
+                                className="block w-full rounded-md px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                            >
+                                {t('Profile')}
+                            </button>
                             <ResponsiveNavLink
                                 method="post"
                                 href={route('logout')}
                                 as="button"
                             >
-                                Log Out
+                                {t('Log out')}
                             </ResponsiveNavLink>
                         </div>
                     </div>
@@ -174,6 +192,18 @@ export default function AuthenticatedLayout({ header, children }) {
             )}
 
             <main>{children}</main>
+
+            {showProfileModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-500/75 p-4">
+                    <div className="relative w-full max-h-[90vh] overflow-hidden rounded-xl bg-white shadow-2xl sm:max-w-4xl">
+                        <ProfileModalContent
+                            mustVerifyEmail={mustVerifyEmail}
+                            status={profileStatus}
+                            onClose={() => setShowProfileModal(false)}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

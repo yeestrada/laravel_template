@@ -18,9 +18,14 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): Response
     {
+        $clientId = config('services.microsoft.client_id');
+        $redirectUri = config('services.microsoft.redirect');
+
         return Inertia::render('Auth/Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => session('status'),
+            'error' => session('error'),
+            'microsoftConfigured' => !empty($clientId) && !empty($redirectUri),
         ]);
     }
 

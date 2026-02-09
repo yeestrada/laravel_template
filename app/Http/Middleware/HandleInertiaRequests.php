@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -35,13 +36,24 @@ class HandleInertiaRequests extends Middleware
             ? (array) json_decode(file_get_contents($langPath), true)
             : [];
 
+        $errors = $request->session()->get('errors');
+        $validationErrors = $errors?->getBag('default')->getMessages() ?: [];
+
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
             ],
+            'mustVerifyEmail' => $user && $user instanceof MustVerifyEmail,
+            'profileStatus' => $request->session()->get('status'),
+            'openProfileModal' => $request->session()->pull('openProfileModal', false),
             'locale' => $locale,
             'translations' => $translations,
+            'appName' => config('app.name'),
+            'appDebug' => config('app.debug'),
+            'validationErrors' => $validationErrors,
         ];
     }
 }

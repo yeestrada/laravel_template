@@ -2,18 +2,21 @@
 
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/locale/{locale}', [LocaleController::class, 'switch'])->name('locale.switch');
 
 Route::get('/', function () {
+    $clientId = config('services.microsoft.client_id');
+    $redirectUri = config('services.microsoft.redirect');
+
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
+        'canResetPassword' => Route::has('password.request'),
+        'microsoftConfigured' => !empty($clientId) && !empty($redirectUri),
+        'loginError' => session('error'),
     ]);
 });
 
