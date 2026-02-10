@@ -84,7 +84,7 @@ export default function ProfileModalContent({ onClose, mustVerifyEmail, status }
                 </nav>
                 <div className="mt-auto border-t border-gray-700 pt-6">
                     <p className="text-center text-xs text-gray-500">
-                        {t('login.secured_by')} {appName || 'Laravel'}
+                        {t('login.secured_by')} {appName || 'WEC System'}
                     </p>
                     {appDebug && (
                         <p className="mt-1 text-center text-xs font-medium text-orange-400">

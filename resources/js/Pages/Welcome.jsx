@@ -5,11 +5,11 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Welcome() {
-    const { auth, appName, validationErrors = {}, canResetPassword, microsoftConfigured, translations = {}, loginError } = usePage().props;
+    const { auth, appName, validationErrors = {}, canResetPassword, microsoftConfigured, translations = {}, loginError, loginErrorDetail, openLoginModal = false } = usePage().props;
     const t = (key) => translations[key] ?? key;
     const hasLoginErrors = validationErrors && (validationErrors.email?.length || validationErrors.password?.length);
     const hasLoginError = !!loginError;
-    const [showLoginModal, setShowLoginModal] = useState(!!hasLoginErrors || hasLoginError);
+    const [showLoginModal, setShowLoginModal] = useState(!!hasLoginErrors || hasLoginError || openLoginModal);
 
     const closeLoginModal = () => {
         setShowLoginModal(false);
@@ -93,6 +93,7 @@ export default function Welcome() {
                         isModal={true}
                         externalErrors={validationErrors}
                         error={loginError}
+                        errorDetail={loginErrorDetail}
                     />
                 </div>
             </Modal>

@@ -1,10 +1,10 @@
 /**
- * Navbar template – EquiForge / Laravel (Inertia).
+ * Navbar template – WEC System (Inertia).
  * Use in Layouts or Pages. Replace or extend as needed.
  */
 import { Link } from "@inertiajs/react";
 
-export function Navbar({ appName = "Laravel" }: { appName?: string }) {
+export function Navbar({ appName = "WEC System" }) {
   return (
     <header className="mx-4 mt-6">
       <div className="border border-black-200 rounded-2xl shadow-sm bg-white">

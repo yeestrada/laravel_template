@@ -17,10 +17,17 @@ Route::get('/', function () {
         'canResetPassword' => Route::has('password.request'),
         'microsoftConfigured' => !empty($clientId) && !empty($redirectUri),
         'loginError' => session('error'),
+        'loginErrorDetail' => session('login_error_detail'),
+        'openLoginModal' => session()->pull('openLoginModal', false),
     ]);
 });
 
 Route::get('/dashboard', function () {
+    $user = auth()->user();
+    $user?->load('role');
+    if ($user && $user->isAdmin()) {
+        return Inertia::render('Admin/Dashboard');
+    }
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
