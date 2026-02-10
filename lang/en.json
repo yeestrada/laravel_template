@@ -3,6 +3,7 @@
     "auth.microsoft_failed": "Microsoft sign-in failed. Please try again.",
     "auth.microsoft_error_state": "State mismatch (session may have expired).",
     "Welcome": "Welcome",
+    "app.name": "WEC System",
     "Dashboard": "Dashboard",
     "Log in": "Log in",
     "Register": "Register",
@@ -33,6 +34,9 @@
     "dashboard.admin.title": "Admin Dashboard",
     "dashboard.admin.welcome": "Welcome, administrator. You have full access.",
     "dashboard.admin.placeholder": "Admin features will be added here.",
+    "admin.menu.dashboard": "Dashboard",
+    "admin.menu.collapse": "Collapse menu",
+    "admin.menu.expand": "Expand menu",
     "profile.information": "Profile Information",
     "profile.information_description": "Update your account's profile information and email address.",
     "profile.name": "Name",
@@ -61,5 +65,6 @@
     "profile.upload": "Upload",
     "profile.recommended_avatar_size": "Recommended size 1:1, up to 10MB.",
     "profile.first_name": "First name",
-    "profile.last_name": "Last name"
+    "profile.last_name": "Last name",
+    "footer.copyright": "© {{year}} WEC System. All rights reserved."
 }

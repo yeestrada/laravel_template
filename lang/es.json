@@ -3,6 +3,7 @@
     "auth.microsoft_failed": "Error al iniciar sesión con Microsoft. Inténtalo de nuevo.",
     "auth.microsoft_error_state": "State no coincide (la sesión pudo haber expirado).",
     "Welcome": "Bienvenido",
+    "app.name": "WEC System",
     "Dashboard": "Panel",
     "Log in": "Iniciar sesión",
     "Register": "Registrarse",
@@ -33,6 +34,9 @@
     "dashboard.admin.title": "Panel de administración",
     "dashboard.admin.welcome": "Bienvenido, administrador. Tienes acceso completo.",
     "dashboard.admin.placeholder": "Las funciones de administración se añadirán aquí.",
+    "admin.menu.dashboard": "Panel",
+    "admin.menu.collapse": "Ocultar menú",
+    "admin.menu.expand": "Mostrar menú",
     "profile.information": "Información del perfil",
     "profile.information_description": "Actualiza la información de tu perfil y tu dirección de correo.",
     "profile.name": "Nombre",
@@ -61,5 +65,6 @@
     "profile.upload": "Subir",
     "profile.recommended_avatar_size": "Tamaño recomendado 1:1, hasta 10MB.",
     "profile.first_name": "Nombre",
-    "profile.last_name": "Apellido"
+    "profile.last_name": "Apellido",
+    "footer.copyright": "© {{year}} WEC System. Todos los derechos reservados."
 }
