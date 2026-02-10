@@ -40,6 +40,9 @@ class HandleInertiaRequests extends Middleware
         $validationErrors = $errors?->getBag('default')->getMessages() ?: [];
 
         $user = $request->user();
+        if ($user) {
+            $user->load('role');
+        }
 
         return [
             ...parent::share($request),

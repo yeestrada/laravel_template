@@ -150,6 +150,64 @@ php artisan serve
 - Web (React): **http://127.0.0.1:8000**
 - API: **http://127.0.0.1:8000/api**
 
+## Despliegue
+
+Pasos para desplegar el proyecto en un entorno nuevo (servidor, staging, otro equipo):
+
+```bash
+# 1. Clonar y entrar al proyecto
+git clone <url-repositorio> laravel_template
+cd laravel_template
+
+# 2. Entorno y clave de aplicación
+cp .env.example .env
+php artisan key:generate
+
+# 3. Configurar .env (base de datos, APP_URL, etc.)
+# Editar: DB_*, APP_URL, y opcionalmente MICROSOFT_* para login con Microsoft
+
+# 4. Dependencias PHP
+composer install --no-dev --optimize-autoloader
+
+# 5. Publicar migración de Sanctum (tokens API)
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+
+# 6. Migraciones
+php artisan migrate --force
+
+# 7. Seeders (roles y usuarios admin) — en este orden
+php artisan db:seed --class=RoleSeeder
+php artisan db:seed --class=AdminUserSeeder
+
+# 8. Frontend: dependencias y build de producción
+npm ci
+npm run build
+
+# 9. (Recomendado en producción) Caché de config y rutas
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+```
+
+### Usuarios admin por defecto
+
+Tras ejecutar los seeders, existirán dos usuarios administrador con contraseña **`admin`**:
+
+- `admin@example.com`
+- `admin@wec.net`
+
+**Importante:** cambia la contraseña en producción.
+
+### Login con Microsoft (opcional)
+
+Si usas "Sign in with Microsoft", configura en `.env`:
+
+- `MICROSOFT_CLIENT_ID`
+- `MICROSOFT_CLIENT_SECRET`
+- `MICROSOFT_TENANT_ID` (opcional; por defecto `common`)
+
+Usa el **valor** del secreto en Azure (Client secret value), no el ID del secreto.
+
 ---
 
 ## About Laravel

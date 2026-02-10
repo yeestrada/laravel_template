@@ -20,6 +20,7 @@ export default function LoginForm({
     canResetPassword = false,
     status = null,
     error = null,
+    errorDetail = null,
     microsoftConfigured = false,
     showFooter = true,
     isModal = false,
@@ -51,7 +52,7 @@ export default function LoginForm({
             <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                     <h1 className="text-xl font-bold text-gray-900">
-                        {t('login.sign_in_to')} {appName || 'Laravel'}
+                        {t('login.sign_in_to')}
                     </h1>
                     <p className="mt-1 text-sm text-gray-500">
                         {t('login.welcome_back')}
@@ -80,6 +81,11 @@ export default function LoginForm({
                 {error && (
                     <div className="mt-4 text-sm font-medium text-red-600">
                         {error}
+                        {errorDetail && (
+                            <p className="mt-1 text-xs font-normal text-red-500 break-words">
+                                {errorDetail}
+                            </p>
+                        )}
                     </div>
                 )}
 
@@ -161,7 +167,7 @@ export default function LoginForm({
                 {showFooter && (
                     <div className="mt-6 flex flex-col items-center gap-2">
                         <p className="text-center text-xs text-gray-400">
-                            {t('login.secured_by')} {appName || 'Laravel'}
+                            {t('login.secured_by')} {appName || 'WEC System'}
                         </p>
                         {appDebug && (
                             <p className="text-center text-xs font-medium text-orange-500">
