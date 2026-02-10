@@ -41,12 +41,16 @@ function SearchIcon({ className = 'h-5 w-5' }) {
     );
 }
 
-export default function RolesIndex() {
-    const { translations = {}, roles: rolesPaginator = {}, flash = {}, search: searchFromProps = '' } = usePage().props;
-    const rolesList = rolesPaginator?.data ?? [];
+const inputDarkClass = 'mt-1 block w-full dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 focus:dark:border-primary-400 focus:dark:ring-primary-500';
+const selectDarkClass = 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:dark:border-primary-400 focus:dark:ring-primary-500 sm:text-sm';
+
+export default function UsersIndex() {
+    const { translations = {}, users: usersPaginator = {}, roles = [], flash = {}, search: searchFromProps = '' } = usePage().props;
+    const usersList = usersPaginator?.data ?? [];
     const t = (key) => translations[key] ?? key;
     const flashError = flash.error;
-    const [editingRole, setEditingRole] = useState(null);
+    const [editingUser, setEditingUser] = useState(null);
+    const [createModalOpen, setCreateModalOpen] = useState(false);
     const [searchInput, setSearchInput] = useState(searchFromProps);
     const searchTimeoutRef = useRef(null);
 
@@ -59,60 +63,67 @@ export default function RolesIndex() {
         setSearchInput(value);
         if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
         searchTimeoutRef.current = setTimeout(() => {
-            router.get(route('admin.roles.index'), { search: value.trim() || undefined, page: 1 }, { preserveState: true });
+            router.get(route('admin.users.index'), { search: value.trim() || undefined, page: 1 }, { preserveState: true });
         }, 300);
     };
 
     const { data, setData, put, post, processing, errors, reset } = useForm({
         name: '',
-        slug: '',
-        description: '',
+        email: '',
+        password: '',
+        password_confirmation: '',
+        role_id: '',
     });
-    const [createModalOpen, setCreateModalOpen] = useState(false);
+
+    const defaultUserRoleId = roles.find((r) => r.slug === 'user')?.id?.toString() ?? roles[0]?.id?.toString() ?? '';
 
     const openCreateModal = () => {
         setCreateModalOpen(true);
-        setEditingRole(null);
-        setData({ name: '', slug: '', description: '' });
+        setEditingUser(null);
+        setData({ name: '', email: '', password: '', password_confirmation: '', role_id: defaultUserRoleId });
     };
 
-    const openEditModal = (role) => {
+    const openEditModal = (user) => {
         setCreateModalOpen(false);
-        setEditingRole(role);
+        setEditingUser(user);
         setData({
-            name: role.name,
-            slug: role.slug,
-            description: role.description ?? '',
+            name: user.name,
+            email: user.email,
+            password: '',
+            password_confirmation: '',
+            role_id: user.role_id?.toString() ?? defaultUserRoleId,
         });
     };
 
     const closeModal = () => {
-        setEditingRole(null);
+        setEditingUser(null);
         setCreateModalOpen(false);
         reset();
     };
 
     const submitForm = (e) => {
         e.preventDefault();
-        if (editingRole) {
-            put(route('admin.roles.update', editingRole.id), {
+        if (editingUser) {
+            put(route('admin.users.update', editingUser.id), {
                 preserveScroll: true,
                 onSuccess: () => closeModal(),
             });
         } else {
-            post(route('admin.roles.store'), {
+            post(route('admin.users.store'), {
                 preserveScroll: true,
                 onSuccess: () => closeModal(),
             });
         }
     };
 
-    const handleDelete = (role) => {
-        if (!window.confirm(t('admin.roles.delete_confirm'))) return;
-        router.delete(route('admin.roles.destroy', role.id), {
+    const handleDelete = (user) => {
+        if (!window.confirm(t('admin.users.delete_confirm'))) return;
+        router.delete(route('admin.users.destroy', user.id), {
             preserveScroll: true,
         });
     };
+
+    const currentUserId = usePage().props.auth?.user?.id;
 
     return (
         <AuthenticatedLayout
@@ -123,13 +134,13 @@ export default function RolesIndex() {
                         <button
                             type="button"
                             onClick={openCreateModal}
-                            title={t('admin.roles.add_role')}
+                            title={t('admin.users.add_user')}
                             className="flex items-center justify-center rounded-lg bg-green-600 p-2 text-white shadow-sm transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                         >
                             <PlusIcon className="h-5 w-5" />
                         </button>
                         <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-100">
-                            {t('admin.roles.title')}
+                            {t('admin.users.title')}
                         </h2>
                     </div>
                     <div className="relative w-full min-w-0 max-w-xs sm:max-w-sm">
@@ -140,14 +151,14 @@ export default function RolesIndex() {
                             type="search"
                             value={searchInput}
                             onChange={handleSearchChange}
-                            placeholder={t('admin.roles.search_placeholder')}
+                            placeholder={t('admin.users.search_placeholder')}
                             className="w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm text-gray-900 placeholder-gray-500 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-primary-400 dark:focus:ring-primary-500"
                         />
                     </div>
                 </div>
             }
         >
-            <Head title={t('admin.roles.title')} />
+            <Head title={t('admin.users.title')} />
 
             <div className="p-4 sm:p-6">
                 <div className="w-full">
@@ -159,66 +170,72 @@ export default function RolesIndex() {
                                 </div>
                             )}
                             <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-                                {t('admin.roles.description')}
+                                {t('admin.users.description')}
                             </p>
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
                                     <thead>
                                         <tr>
                                             <th className="bg-gray-50 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:bg-gray-700/50 dark:text-gray-300">
-                                                {t('admin.roles.name')}
+                                                {t('admin.users.name')}
                                             </th>
                                             <th className="bg-gray-50 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:bg-gray-700/50 dark:text-gray-300">
-                                                {t('admin.roles.slug')}
+                                                {t('admin.users.email')}
                                             </th>
                                             <th className="bg-gray-50 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:bg-gray-700/50 dark:text-gray-300">
-                                                {t('admin.roles.users_count')}
+                                                {t('admin.users.role')}
                                             </th>
                                             <th className="bg-gray-50 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:bg-gray-700/50 dark:text-gray-300">
-                                                {t('admin.roles.description_label')}
+                                                {t('admin.users.created')}
                                             </th>
                                             <th className="w-0 bg-gray-50 px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:bg-gray-700/50 dark:text-gray-300">
-                                                {t('admin.roles.actions')}
+                                                {t('admin.users.actions')}
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-gray-800">
-                                        {rolesList.length === 0 ? (
+                                        {usersList.length === 0 ? (
                                             <tr>
                                                 <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                                    {t('admin.roles.empty')}
+                                                    {t('admin.users.empty')}
                                                 </td>
                                             </tr>
                                         ) : (
-                                            rolesList.map((role) => (
-                                                <tr key={role.id}>
+                                            usersList.map((user) => (
+                                                <tr key={user.id}>
                                                     <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {role.name}
+                                                        {user.name}
                                                     </td>
                                                     <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                                                        {role.slug}
+                                                        {user.email}
                                                     </td>
                                                     <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                                                        {role.users_count}
+                                                        {user.role?.name ?? t('admin.users.role_default')}
                                                     </td>
-                                                    <td className="max-w-xs px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                                                        {role.description || '—'}
+                                                    <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                                        {user.created_at
+                                                            ? new Date(user.created_at).toLocaleDateString(undefined, {
+                                                                  year: 'numeric',
+                                                                  month: 'short',
+                                                                  day: 'numeric',
+                                                              })
+                                                            : '—'}
                                                     </td>
                                                     <td className="w-0 whitespace-nowrap pl-4 pr-[15px] py-3 text-right text-sm">
-                                                        <div className="flex items-center justify-end gap-1">
+                                                        <div className="flex items-center justify-end gap-3">
                                                             <button
                                                                 type="button"
-                                                                onClick={() => openEditModal(role)}
-                                                                title={t('admin.roles.edit')}
+                                                                onClick={() => openEditModal(user)}
+                                                                title={t('admin.users.edit')}
                                                                 className="flex items-center justify-center rounded-lg bg-white p-2 text-gray-800 shadow-sm transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 dark:focus:ring-gray-500 dark:focus:ring-offset-gray-800"
                                                             >
                                                                 <PencilIcon />
                                                             </button>
                                                             <button
                                                                 type="button"
-                                                                onClick={() => handleDelete(role)}
-                                                                disabled={role.slug === 'admin' || role.users_count > 0}
-                                                                title={t('admin.roles.delete')}
+                                                                onClick={() => handleDelete(user)}
+                                                                disabled={user.id === currentUserId}
+                                                                title={t('admin.users.delete')}
                                                                 className="flex items-center justify-center rounded-lg bg-red-600 p-2 text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed dark:focus:ring-offset-gray-800"
                                                             >
                                                                 <TrashIcon />
@@ -231,9 +248,9 @@ export default function RolesIndex() {
                                     </tbody>
                                 </table>
                             </div>
-                            {rolesPaginator?.links && (
+                            {usersPaginator?.links && (
                                 <div className="mt-4 border-t border-gray-200 px-4 py-3 dark:border-gray-600 sm:px-5">
-                                    <Pagination paginator={rolesPaginator} />
+                                    <Pagination paginator={usersPaginator} />
                                 </div>
                             )}
                         </div>
@@ -241,44 +258,84 @@ export default function RolesIndex() {
                 </div>
             </div>
 
-            <Modal show={createModalOpen || !!editingRole} onClose={closeModal} maxWidth="md">
-                <form onSubmit={submitForm} className="p-6">
+            <Modal show={createModalOpen || !!editingUser} onClose={closeModal} maxWidth="md">
+                <form onSubmit={submitForm} className="p-6" autoComplete="off">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        {editingRole ? t('admin.roles.edit_modal_title') : t('admin.roles.create_modal_title')}
+                        {editingUser ? t('admin.users.edit_modal_title') : t('admin.users.create_modal_title')}
                     </h3>
                     <div className="mt-4 space-y-4">
                         <div>
-                            <InputLabel htmlFor="role-name" value={t('admin.roles.name')} className="dark:text-gray-200" />
+                            <InputLabel htmlFor={editingUser ? 'user-name' : 'create-user-name'} value={t('admin.users.name')} className="dark:text-gray-200" />
                             <TextInput
-                                id="role-name"
+                                id={editingUser ? 'user-name' : 'create-user-name'}
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className="mt-1 block w-full dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 focus:dark:border-primary-400 focus:dark:ring-primary-500"
+                                className={inputDarkClass}
+                                autoComplete="off"
                                 required
                             />
                             <InputError message={errors.name} className="mt-1 dark:text-red-400" />
                         </div>
                         <div>
-                            <InputLabel htmlFor="role-slug" value={t('admin.roles.slug')} className="dark:text-gray-200" />
+                            <InputLabel htmlFor={editingUser ? 'user-email' : 'create-user-email'} value={t('admin.users.email')} className="dark:text-gray-200" />
                             <TextInput
-                                id="role-slug"
-                                value={data.slug}
-                                onChange={(e) => setData('slug', e.target.value)}
-                                className="mt-1 block w-full dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 focus:dark:border-primary-400 focus:dark:ring-primary-500"
+                                id={editingUser ? 'user-email' : 'create-user-email'}
+                                type="email"
+                                value={data.email}
+                                onChange={(e) => setData('email', e.target.value)}
+                                className={inputDarkClass}
+                                autoComplete="off"
                                 required
                             />
-                            <InputError message={errors.slug} className="mt-1 dark:text-red-400" />
+                            <InputError message={errors.email} className="mt-1 dark:text-red-400" />
                         </div>
+                        {!editingUser && (
+                            <>
+                                <div>
+                                    <InputLabel htmlFor="create-user-password" value={t('admin.users.password')} className="dark:text-gray-200" />
+                                    <TextInput
+                                        id="create-user-password"
+                                        type="password"
+                                        value={data.password}
+                                        onChange={(e) => setData('password', e.target.value)}
+                                        className={inputDarkClass}
+                                        autoComplete="new-password"
+                                        required={!editingUser}
+                                    />
+                                    <InputError message={errors.password} className="mt-1 dark:text-red-400" />
+                                </div>
+                                <div>
+                                    <InputLabel htmlFor="user-password_confirmation" value={t('admin.users.password_confirmation')} className="dark:text-gray-200" />
+                                    <TextInput
+                                        id="create-user-password_confirmation"
+                                        type="password"
+                                        value={data.password_confirmation}
+                                        onChange={(e) => setData('password_confirmation', e.target.value)}
+                                        className={inputDarkClass}
+                                        autoComplete="new-password"
+                                        required={!editingUser}
+                                    />
+                                    <InputError message={errors.password_confirmation} className="mt-1 dark:text-red-400" />
+                                </div>
+                            </>
+                        )}
                         <div>
-                            <InputLabel htmlFor="role-description" value={t('admin.roles.description_label')} className="dark:text-gray-200" />
-                            <textarea
-                                id="role-description"
-                                value={data.description}
-                                onChange={(e) => setData('description', e.target.value)}
-                                rows={3}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 focus:dark:border-primary-400 focus:dark:ring-primary-500 sm:text-sm"
-                            />
-                            <InputError message={errors.description} className="mt-1 dark:text-red-400" />
+                            <InputLabel htmlFor="user-role_id" value={t('admin.users.role')} className="dark:text-gray-200" />
+                            <select
+                                id="user-role_id"
+                                value={data.role_id}
+                                onChange={(e) => setData('role_id', e.target.value)}
+                                className={selectDarkClass}
+                                required
+                            >
+                                <option value="">{t('admin.users.select_role')}</option>
+                                {roles.map((role) => (
+                                    <option key={role.id} value={role.id}>
+                                        {role.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <InputError message={errors.role_id} className="mt-1 dark:text-red-400" />
                         </div>
                     </div>
                     <div className="mt-6 flex justify-end gap-3">
@@ -287,10 +344,10 @@ export default function RolesIndex() {
                             onClick={closeModal}
                             className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                         >
-                            {t('admin.roles.cancel')}
+                            {t('admin.users.cancel')}
                         </button>
                         <PrimaryButton type="submit" disabled={processing}>
-                            {t('admin.roles.save')}
+                            {t('admin.users.save')}
                         </PrimaryButton>
                     </div>
                 </form>

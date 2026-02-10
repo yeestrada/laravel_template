@@ -8,6 +8,7 @@ export default function AdminSidebar({ sidebarOpen = true, onToggleSidebar }) {
     const menuItems = [
         { href: route('dashboard'), label: t('admin.menu.dashboard'), routeName: 'dashboard' },
         { href: route('admin.roles.index'), label: t('admin.menu.roles'), routeName: 'admin.roles.index' },
+        { href: route('admin.users.index'), label: t('admin.menu.users'), routeName: 'admin.users.index' },
     ];
 
     return (
