@@ -1,4 +1,5 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import UserSidebar from '@/Components/UserSidebar';
 import { Head, usePage } from '@inertiajs/react';
 
 export default function Dashboard() {
@@ -7,20 +8,21 @@ export default function Dashboard() {
 
     return (
         <AuthenticatedLayout
+            sidebar={<UserSidebar />}
             header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-100">
                     {t('dashboard.user.title')}
                 </h2>
             }
         >
             <Head title={t('dashboard.user.title')} />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-                        <div className="p-6 text-gray-900">
+            <div className="p-4 sm:p-6">
+                <div className="w-full">
+                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800 dark:ring-1 dark:ring-gray-700">
+                        <div className="p-4 sm:p-5 text-gray-900 dark:text-gray-100">
                             <p>{t('dashboard.user.welcome')}</p>
-                            <p className="mt-2 text-sm text-gray-500">
+                            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                                 {t('dashboard.user.placeholder')}
                             </p>
                         </div>

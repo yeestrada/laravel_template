@@ -52,6 +52,9 @@ class HandleInertiaRequests extends Middleware
             'mustVerifyEmail' => $user && $user instanceof MustVerifyEmail,
             'profileStatus' => $request->session()->get('status'),
             'openProfileModal' => $request->session()->pull('openProfileModal', false),
+            'flash' => [
+                'error' => $request->session()->pull('error'),
+            ],
             'locale' => $locale,
             'translations' => $translations,
             'appName' => config('app.name'),

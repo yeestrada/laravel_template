@@ -47,7 +47,7 @@ export default function LanguageSelector({ className = '', buttonClass = '' }) {
                 <button
                     type="button"
                     className={
-                        `flex items-center justify-center rounded-lg bg-white p-2.5 text-gray-800 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-white/80 focus:ring-offset-2 focus:ring-offset-black-500/20 ${
+                        `flex items-center justify-center rounded-lg bg-white p-2.5 text-gray-800 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-white/80 focus:ring-offset-2 focus:ring-offset-black-500/20 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:border dark:border-gray-600 ${
                             buttonClass || ''
                         }`.trim()
                     }
@@ -56,18 +56,18 @@ export default function LanguageSelector({ className = '', buttonClass = '' }) {
                     <GlobeIcon />
                 </button>
             </Dropdown.Trigger>
-            <Dropdown.Content align="right" width="48" contentClasses="py-1 bg-white rounded-lg shadow-xl">
+            <Dropdown.Content align="right" width="48" contentClasses="py-1 bg-white dark:bg-gray-800 dark:ring-gray-600 rounded-lg shadow-xl">
                 {LOCALES.map(({ code, label }) => (
                     <Link
                         key={code}
                         href={route('locale.switch', code)}
                         preserveScroll
-                        className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-gray-700 transition hover:bg-gray-100 ${
-                            currentLocale === code ? 'bg-gray-50 font-medium' : ''
+                        className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-gray-700 transition hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700 ${
+                            currentLocale === code ? 'bg-gray-50 font-medium dark:bg-gray-700 dark:text-gray-100' : ''
                         }`}
                     >
                         {currentLocale === code ? (
-                            <CheckIcon className="h-4 w-4 shrink-0 text-gray-700" />
+                            <CheckIcon className="h-4 w-4 shrink-0 text-gray-700 dark:text-gray-200" />
                         ) : (
                             <span className="w-4 shrink-0" aria-hidden />
                         )}
