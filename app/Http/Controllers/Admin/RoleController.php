@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Permission;
 use App\Models\Role;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -19,6 +21,11 @@ class RoleController extends Controller
     public function index(Request $request): Response
     {
         $search = $request->string('search')->trim();
+        $perPageOptions = config('pagination.per_page_options', [10, 15, 25, 50, 100]);
+        $perPage = (int) $request->input('per_page', config('pagination.per_page', 15));
+        if (! in_array($perPage, $perPageOptions, true)) {
+            $perPage = config('pagination.per_page', 15);
+        }
 
         $query = Role::withCount('users')->orderBy('name');
 
@@ -30,11 +37,13 @@ class RoleController extends Controller
             });
         }
 
-        $roles = $query->paginate(15)->withQueryString();
+        $roles = $query->paginate($perPage)->withQueryString();
 
         return Inertia::render('Admin/Roles/Index', [
             'roles' => $roles,
             'search' => $search->toString(),
+            'per_page' => $perPage,
+            'per_page_options' => $perPageOptions,
         ]);
     }
 
@@ -94,5 +103,50 @@ class RoleController extends Controller
         $role->delete();
 
         return redirect()->route('admin.roles.index')->with('status', 'role-deleted');
+    }
+
+    /**
+     * Get permissions for a role.
+     */
+    public function permissions(Role $role): JsonResponse
+    {
+        $role->load('permissions');
+        $allPermissions = Permission::orderBy('name')->get();
+        $assignedPermissionIds = $role->permissions->pluck('id')->toArray();
+        
+        $available = $allPermissions->reject(function ($permission) use ($assignedPermissionIds) {
+            return in_array($permission->id, $assignedPermissionIds);
+        })->values();
+        
+        $assigned = $role->permissions->sortBy('name')->values();
+
+        return response()->json([
+            'available' => $available,
+            'assigned' => $assigned,
+        ]);
+    }
+
+    /**
+     * Update permissions for a role.
+     * A role may have zero permissions; permission_ids can be an empty array.
+     */
+    public function updatePermissions(Request $request, Role $role): JsonResponse
+    {
+        $permissionIds = $request->input('permission_ids', []);
+        if (! is_array($permissionIds)) {
+            $permissionIds = [];
+        }
+
+        $request->validate([
+            'permission_ids' => ['nullable', 'array'],
+            'permission_ids.*' => ['exists:permissions,id'],
+        ]);
+
+        $role->permissions()->sync($permissionIds);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('admin.roles.permissions_updated'),
+        ]);
     }
 }

@@ -20,6 +20,11 @@ class UserController extends Controller
     public function index(Request $request): Response
     {
         $search = $request->string('search')->trim();
+        $perPageOptions = config('pagination.per_page_options', [10, 15, 25, 50, 100]);
+        $perPage = (int) $request->input('per_page', config('pagination.per_page', 15));
+        if (! in_array($perPage, $perPageOptions, true)) {
+            $perPage = config('pagination.per_page', 15);
+        }
 
         $query = User::with('role')->orderBy('name');
 
@@ -34,7 +39,7 @@ class UserController extends Controller
             });
         }
 
-        $users = $query->paginate(15)->withQueryString();
+        $users = $query->paginate($perPage)->withQueryString();
 
         $roles = Role::orderBy('name')->get(['id', 'name', 'slug']);
 
@@ -42,6 +47,8 @@ class UserController extends Controller
             'users' => $users,
             'roles' => $roles,
             'search' => $search->toString(),
+            'per_page' => $perPage,
+            'per_page_options' => $perPageOptions,
         ]);
     }
 

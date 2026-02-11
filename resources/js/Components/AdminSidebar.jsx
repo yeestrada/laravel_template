@@ -39,6 +39,19 @@ function UsersIcon({ className = 'h-4 w-4' }) {
     );
 }
 
+function PermissionsIcon({ className = 'h-4 w-4' }) {
+    return (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            />
+        </svg>
+    );
+}
+
 export default function AdminSidebar({ sidebarOpen = true, onToggleSidebar }) {
     const { translations = {} } = usePage().props;
     const t = (key) => translations[key] ?? key;
@@ -46,11 +59,23 @@ export default function AdminSidebar({ sidebarOpen = true, onToggleSidebar }) {
 
     return (
         <aside className="flex h-full flex-col">
-            <div className="flex items-start justify-end p-2">
+            <div className={`flex items-center gap-1 px-2 py-2 ${sidebarOpen ? '' : 'justify-center'}`}>
+                <Link
+                    href={route('dashboard')}
+                    className={
+                        'flex min-w-0 flex-1 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ' +
+                        (current === 'dashboard'
+                            ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/30 dark:text-gray-100'
+                            : 'text-gray-600 hover:bg-white hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100')
+                    }
+                >
+                    <DashboardIcon />
+                    {sidebarOpen && <span className="truncate">{t('admin.menu.dashboard')}</span>}
+                </Link>
                 <button
                     type="button"
                     onClick={onToggleSidebar}
-                    className="flex shrink-0 items-center justify-center rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100"
+                    className="flex shrink-0 items-center justify-center rounded-lg p-2 text-gray-500 transition hover:bg-white hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100"
                     aria-label={sidebarOpen ? t('admin.menu.collapse') : t('admin.menu.expand')}
                     title={sidebarOpen ? t('admin.menu.collapse') : t('admin.menu.expand')}
                 >
@@ -65,23 +90,7 @@ export default function AdminSidebar({ sidebarOpen = true, onToggleSidebar }) {
                     )}
                 </button>
             </div>
-            <nav className={`flex flex-1 flex-col gap-1 p-4 ${sidebarOpen ? '' : 'hidden'}`}>
-                {/* Main section */}
-                <Link
-                    href={route('dashboard')}
-                    className={
-                        'rounded-lg px-3 py-2 text-sm font-medium transition ' +
-                        (current === 'dashboard'
-                            ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/30 dark:text-gray-100'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100')
-                    }
-                >
-                    <span className="flex items-center gap-2">
-                        <DashboardIcon />
-                        <span>{t('admin.menu.dashboard')}</span>
-                    </span>
-                </Link>
-
+            <nav className={`flex flex-1 flex-col gap-1 px-4 pb-4 pt-1 ${sidebarOpen ? '' : 'hidden'}`}>
                 {/* Administration separator */}
                 <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
                     {t('admin.menu.administration')}
@@ -115,6 +124,21 @@ export default function AdminSidebar({ sidebarOpen = true, onToggleSidebar }) {
                     <span className="flex items-center gap-2">
                         <UsersIcon />
                         <span>{t('admin.menu.users')}</span>
+                    </span>
+                </Link>
+
+                <Link
+                    href={route('admin.permissions.index')}
+                    className={
+                        'rounded-lg px-3 py-2 text-sm font-medium transition ' +
+                        (current === 'admin.permissions.index'
+                            ? 'bg-primary-50 text-primary-700 dark:bg-primary-500/30 dark:text-gray-100'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-100')
+                    }
+                >
+                    <span className="flex items-center gap-2">
+                        <PermissionsIcon />
+                        <span>{t('admin.menu.permissions')}</span>
                     </span>
                 </Link>
             </nav>
