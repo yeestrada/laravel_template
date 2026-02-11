@@ -1,6 +1,7 @@
 import LanguageSelector from '@/Components/LanguageSelector';
 import LoginForm from '@/Components/LoginForm';
 import Modal from '@/Components/Modal';
+import ThemeToggle from '@/Components/ThemeToggle';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -36,6 +37,7 @@ export default function Welcome() {
                 />
 
                 <div className="absolute right-4 top-4 z-10 flex items-center gap-2">
+                    <ThemeToggle buttonClass="bg-white/95 text-gray-900 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-700 dark:border-gray-600" />
                     <LanguageSelector />
                 </div>
 
@@ -67,12 +69,6 @@ export default function Welcome() {
                                     >
                                         {t('welcome.sign_in')}
                                     </button>
-                                    <Link
-                                        href={route('register')}
-                                        className="inline-flex items-center justify-center rounded-lg border-2 border-white/90 bg-white/10 px-8 py-3.5 text-ef-label font-ef-medium text-white backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black-500/50"
-                                    >
-                                        {t('welcome.create_account')}
-                                    </Link>
                                 </>
                             )}
                         </div>

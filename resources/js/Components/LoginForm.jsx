@@ -49,12 +49,21 @@ export default function LoginForm({
 
     return (
         <div className="relative w-full">
+            <div className="mb-6 text-center">
+                <img
+                    src="/images/WEC_Horizontal_Black.png"
+                    alt={appName || t('Welcome')}
+                    className="mx-auto h-8 w-auto object-contain object-center sm:h-10"
+                    style={{ filter: 'brightness(0) invert(1)' }}
+                />
+            </div>
+
             <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                    <h1 className="text-xl font-bold text-gray-900">
+                    <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                         {t('login.sign_in_to')}
                     </h1>
-                    <p className="mt-1 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                         {t('login.welcome_back')}
                     </p>
                 </div>
@@ -62,7 +71,7 @@ export default function LoginForm({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex shrink-0 h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition hover:bg-gray-300"
+                        className="flex shrink-0 h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500"
                         aria-label="Close"
                     >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,15 +83,15 @@ export default function LoginForm({
 
             <div className="w-full">
                 {status && (
-                    <div className="mt-4 text-sm font-medium text-green-600">
+                    <div className="mt-4 text-sm font-medium text-green-600 dark:text-green-400">
                         {status}
                     </div>
                 )}
                 {error && (
-                    <div className="mt-4 text-sm font-medium text-red-600">
+                    <div className="mt-4 text-sm font-medium text-red-600 dark:text-red-400">
                         {error}
                         {errorDetail && (
-                            <p className="mt-1 text-xs font-normal text-red-500 break-words">
+                            <p className="mt-1 text-xs font-normal text-red-500 dark:text-red-400 break-words">
                                 {errorDetail}
                             </p>
                         )}
@@ -92,7 +101,7 @@ export default function LoginForm({
                 <div className="mt-6">
                     <a
                         href={route('auth.microsoft.redirect')}
-                        className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50"
+                        className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                     >
                         <MicrosoftLogo />
                         {t('login.continue_with_microsoft')}
@@ -100,10 +109,10 @@ export default function LoginForm({
                 </div>
                 <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-200" />
+                        <div className="w-full border-t border-gray-200 dark:border-gray-600" />
                     </div>
                     <div className="relative flex justify-center">
-                        <span className="bg-white px-2 text-sm text-gray-500">{t('login.or')}</span>
+                        <span className="bg-white px-2 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-400">{t('login.or')}</span>
                     </div>
                 </div>
 
@@ -115,7 +124,7 @@ export default function LoginForm({
                             type="email"
                             name="email"
                             value={data.email}
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 focus:dark:border-primary-400 focus:dark:ring-primary-500"
                             autoComplete="username"
                             isFocused={isModal}
                             onChange={(e) => setData('email', e.target.value)}
@@ -130,7 +139,7 @@ export default function LoginForm({
                             type="password"
                             name="password"
                             value={data.password}
-                            className="mt-1 block w-full"
+                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 focus:dark:border-primary-400 focus:dark:ring-primary-500"
                             autoComplete="current-password"
                             onChange={(e) => setData('password', e.target.value)}
                         />
@@ -141,7 +150,7 @@ export default function LoginForm({
                         <div className="mt-2 text-right">
                             <Link
                                 href={route('password.request')}
-                                className="text-sm text-gray-600 underline hover:text-gray-900"
+                                className="text-sm text-gray-600 underline hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
                             >
                                 {t('login.forgot_password')}
                             </Link>
@@ -166,11 +175,11 @@ export default function LoginForm({
 
                 {showFooter && (
                     <div className="mt-6 flex flex-col items-center gap-2">
-                        <p className="text-center text-xs text-gray-400">
+                        <p className="text-center text-xs text-gray-400 dark:text-gray-500">
                             {t('login.secured_by')} {appName || 'WEC System'}
                         </p>
                         {appDebug && (
-                            <p className="text-center text-xs font-medium text-orange-500">
+                            <p className="text-center text-xs font-medium text-orange-500 dark:text-orange-400">
                                 {t('login.development_mode')}
                             </p>
                         )}

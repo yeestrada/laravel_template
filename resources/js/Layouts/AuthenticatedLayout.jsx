@@ -29,9 +29,9 @@ export default function AuthenticatedLayout({ header, children, sidebar = null }
                             <div className="flex shrink-0 items-center">
                                 <Link href="/" className="block">
                                     <img
-                                        src="/images/WEC_Horsehead_Only_Black.png"
-                                        alt=""
-                                        className="block h-9 w-auto object-contain dark:invert"
+                                        src="/images/WEC_Horizontal_Black.png"
+                                        alt={t('app.name')}
+                                        className="block h-8 w-auto object-contain dark:invert"
                                     />
                                 </Link>
                             </div>
@@ -211,7 +211,18 @@ export default function AuthenticatedLayout({ header, children, sidebar = null }
                         </header>
                     )}
 
-                    <main className="flex-1">{children}</main>
+                    <main className="flex-1">
+                        <div className="relative h-full min-h-full">
+                            <img
+                                src="/images/WEC_Horsehead_Only_Black.png"
+                                alt=""
+                                className="pointer-events-none select-none absolute inset-0 mx-auto my-0 h-auto w-[60%] max-w-4xl opacity-[0.03] dark:opacity-[0.12] dark:invert"
+                            />
+                            <div className="relative z-10 h-full">
+                                {children}
+                            </div>
+                        </div>
+                    </main>
 
                     <footer className="mt-auto border-t border-gray-200 bg-white py-4 dark:border-gray-700 dark:bg-gray-800">
                         <div className="w-full px-4 sm:px-6 lg:px-8">
