@@ -53,8 +53,7 @@ export default function LoginForm({
                 <img
                     src="/images/WEC_Horizontal_Black.png"
                     alt={appName || t('Welcome')}
-                    className="mx-auto h-8 w-auto object-contain object-center sm:h-10"
-                    style={{ filter: 'brightness(0) invert(1)' }}
+                    className="mx-auto h-8 w-auto object-contain object-center dark:invert sm:h-10"
                 />
             </div>
 

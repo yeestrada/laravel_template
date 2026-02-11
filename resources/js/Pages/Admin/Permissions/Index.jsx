@@ -41,16 +41,12 @@ function SearchIcon({ className = 'h-5 w-5' }) {
     );
 }
 
-const inputDarkClass = 'mt-1 block w-full dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 focus:dark:border-primary-400 focus:dark:ring-primary-500';
-const selectDarkClass = 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 focus:dark:border-primary-400 focus:dark:ring-primary-500 sm:text-sm';
-
-export default function UsersIndex() {
-    const { translations = {}, users: usersPaginator = {}, roles = [], flash = {}, search: searchFromProps = '', per_page: perPageFromProps = 15, per_page_options: perPageOptions = [10, 15, 25, 50, 100] } = usePage().props;
-    const usersList = usersPaginator?.data ?? [];
+export default function PermissionsIndex() {
+    const { translations = {}, permissions: permissionsPaginator = {}, flash = {}, search: searchFromProps = '', per_page: perPageFromProps = 15, per_page_options: perPageOptions = [10, 15, 25, 50, 100] } = usePage().props;
+    const permissionsList = permissionsPaginator?.data ?? [];
     const t = (key) => translations[key] ?? key;
     const flashError = flash.error;
-    const [editingUser, setEditingUser] = useState(null);
-    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [editingPermission, setEditingPermission] = useState(null);
     const [searchInput, setSearchInput] = useState(searchFromProps);
     const searchTimeoutRef = useRef(null);
 
@@ -63,67 +59,58 @@ export default function UsersIndex() {
         setSearchInput(value);
         if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
         searchTimeoutRef.current = setTimeout(() => {
-            router.get(route('admin.users.index'), { search: value.trim() || undefined, page: 1 }, { preserveState: true });
+            router.get(route('admin.permissions.index'), { search: value.trim() || undefined, page: 1 }, { preserveState: true });
         }, 300);
     };
 
     const { data, setData, put, post, processing, errors, reset } = useForm({
         name: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
-        role_id: '',
+        description: '',
     });
-
-    const defaultUserRoleId = roles.find((r) => r.slug === 'user')?.id?.toString() ?? roles[0]?.id?.toString() ?? '';
+    const [createModalOpen, setCreateModalOpen] = useState(false);
 
     const openCreateModal = () => {
         setCreateModalOpen(true);
-        setEditingUser(null);
-        setData({ name: '', email: '', password: '', password_confirmation: '', role_id: defaultUserRoleId });
+        setEditingPermission(null);
+        setData({ name: '', description: '' });
     };
 
-    const openEditModal = (user) => {
-        setCreateModalOpen(false);
-        setEditingUser(user);
+    const openEditModal = (permission) => {
+        setCreateModalOpen(true);
+        setEditingPermission(permission);
         setData({
-            name: user.name,
-            email: user.email,
-            password: '',
-            password_confirmation: '',
-            role_id: user.role_id?.toString() ?? defaultUserRoleId,
+            name: permission.name,
+            description: permission.description ?? '',
         });
     };
 
     const closeModal = () => {
-        setEditingUser(null);
+        setEditingPermission(null);
         setCreateModalOpen(false);
         reset();
     };
 
     const submitForm = (e) => {
         e.preventDefault();
-        if (editingUser) {
-            put(route('admin.users.update', editingUser.id), {
+        if (editingPermission) {
+            put(route('admin.permissions.update', editingPermission.id), {
                 preserveScroll: true,
                 onSuccess: () => closeModal(),
             });
         } else {
-            post(route('admin.users.store'), {
+            post(route('admin.permissions.store'), {
                 preserveScroll: true,
                 onSuccess: () => closeModal(),
             });
         }
     };
 
-    const handleDelete = (user) => {
-        if (!window.confirm(t('admin.users.delete_confirm'))) return;
-        router.delete(route('admin.users.destroy', user.id), {
+    const handleDelete = (permission) => {
+        if (!window.confirm(t('admin.permissions.delete_confirm'))) return;
+        router.delete(route('admin.permissions.destroy', permission.id), {
             preserveScroll: true,
         });
     };
-
-    const currentUserId = usePage().props.auth?.user?.id;
 
     return (
         <AuthenticatedLayout
@@ -134,13 +121,13 @@ export default function UsersIndex() {
                         <button
                             type="button"
                             onClick={openCreateModal}
-                            title={t('admin.users.add_user')}
+                            title={t('admin.permissions.add_permission')}
                             className="flex items-center justify-center rounded-lg bg-green-600 p-2 text-white shadow-sm transition hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
                         >
                             <PlusIcon className="h-5 w-5" />
                         </button>
                         <h2 className="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-100">
-                            {t('admin.users.title')}
+                            {t('admin.permissions.title')}
                         </h2>
                     </div>
                     <div className="relative w-full min-w-0 max-w-xs sm:max-w-sm">
@@ -151,14 +138,14 @@ export default function UsersIndex() {
                             type="search"
                             value={searchInput}
                             onChange={handleSearchChange}
-                            placeholder={t('admin.users.search_placeholder')}
+                            placeholder={t('admin.permissions.search_placeholder')}
                             className="w-full rounded-md border border-gray-300 bg-white py-2 pl-10 pr-3 text-sm text-gray-900 placeholder-gray-500 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-primary-400 dark:focus:ring-primary-500"
                         />
                     </div>
                 </div>
             }
         >
-            <Head title={t('admin.users.title')} />
+            <Head title={t('admin.permissions.title')} />
 
             <div className="flex h-full min-h-0 flex-1 flex-col p-4 sm:p-6">
                 <div className="flex min-h-0 w-full flex-1">
@@ -170,72 +157,60 @@ export default function UsersIndex() {
                                 </div>
                             )}
                             <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-                                {t('admin.users.description')}
+                                {t('admin.permissions.description')}
                             </p>
                             <div className="min-h-0 flex-1 overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
                                     <thead>
                                         <tr>
                                             <th className="bg-gray-50 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:bg-gray-700/50 dark:text-gray-300">
-                                                {t('admin.users.name')}
+                                                {t('admin.permissions.name')}
                                             </th>
                                             <th className="bg-gray-50 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:bg-gray-700/50 dark:text-gray-300">
-                                                {t('admin.users.email')}
+                                                {t('admin.permissions.roles_count')}
                                             </th>
                                             <th className="bg-gray-50 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:bg-gray-700/50 dark:text-gray-300">
-                                                {t('admin.users.role')}
-                                            </th>
-                                            <th className="bg-gray-50 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:bg-gray-700/50 dark:text-gray-300">
-                                                {t('admin.users.created')}
+                                                {t('admin.permissions.description_label')}
                                             </th>
                                             <th className="w-0 bg-gray-50 px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:bg-gray-700/50 dark:text-gray-300">
-                                                {t('admin.users.actions')}
+                                                {t('admin.permissions.actions')}
                                             </th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-gray-800">
-                                        {usersList.length === 0 ? (
+                                        {permissionsList.length === 0 ? (
                                             <tr>
-                                                <td colSpan={5} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                                                    {t('admin.users.empty')}
+                                                <td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                                    {t('admin.permissions.empty')}
                                                 </td>
                                             </tr>
                                         ) : (
-                                            usersList.map((user) => (
-                                                <tr key={user.id}>
+                                            permissionsList.map((permission) => (
+                                                <tr key={permission.id}>
                                                     <td className="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {user.name}
+                                                        {permission.name}
                                                     </td>
                                                     <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                                                        {user.email}
+                                                        {permission.roles_count}
                                                     </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                                                        {user.role?.name ?? t('admin.users.role_default')}
-                                                    </td>
-                                                    <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                                                        {user.created_at
-                                                            ? new Date(user.created_at).toLocaleDateString(undefined, {
-                                                                  year: 'numeric',
-                                                                  month: 'short',
-                                                                  day: 'numeric',
-                                                              })
-                                                            : '—'}
+                                                    <td className="max-w-xs px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                                                        {permission.description || '—'}
                                                     </td>
                                                     <td className="w-0 whitespace-nowrap pl-4 pr-[15px] py-3 text-right text-sm">
                                                         <div className="flex items-center justify-end gap-3">
                                                             <button
                                                                 type="button"
-                                                                onClick={() => openEditModal(user)}
-                                                                title={t('admin.users.edit')}
+                                                                onClick={() => openEditModal(permission)}
+                                                                title={t('admin.permissions.edit')}
                                                                 className="flex items-center justify-center rounded-lg bg-white p-2 text-gray-800 shadow-sm transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 dark:focus:ring-gray-500 dark:focus:ring-offset-gray-800"
                                                             >
                                                                 <PencilIcon />
                                                             </button>
                                                             <button
                                                                 type="button"
-                                                                onClick={() => handleDelete(user)}
-                                                                disabled={user.id === currentUserId}
-                                                                title={t('admin.users.delete')}
+                                                                onClick={() => handleDelete(permission)}
+                                                                disabled={permission.roles_count > 0}
+                                                                title={t('admin.permissions.delete')}
                                                                 className="flex items-center justify-center rounded-lg bg-red-600 p-2 text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed dark:focus:ring-offset-gray-800"
                                                             >
                                                                 <TrashIcon />
@@ -248,13 +223,13 @@ export default function UsersIndex() {
                                     </tbody>
                                 </table>
                             </div>
-                            {usersPaginator?.links && (
+                            {permissionsPaginator?.links && (
                                 <div className="mt-4 border-t border-gray-200 px-4 py-3 dark:border-gray-600 sm:px-5">
                                     <Pagination
-                                        paginator={usersPaginator}
+                                        paginator={permissionsPaginator}
                                         perPage={perPageFromProps}
                                         perPageOptions={perPageOptions}
-                                        routeName="admin.users.index"
+                                        routeName="admin.permissions.index"
                                         queryParams={{ search: searchInput.trim() || undefined }}
                                         t={t}
                                     />
@@ -265,84 +240,33 @@ export default function UsersIndex() {
                 </div>
             </div>
 
-            <Modal show={createModalOpen || !!editingUser} onClose={closeModal} maxWidth="md">
-                <form onSubmit={submitForm} className="p-6" autoComplete="off">
+            <Modal show={createModalOpen || !!editingPermission} onClose={closeModal} maxWidth="md">
+                <form onSubmit={submitForm} className="p-6">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        {editingUser ? t('admin.users.edit_modal_title') : t('admin.users.create_modal_title')}
+                        {editingPermission ? t('admin.permissions.edit_modal_title') : t('admin.permissions.create_modal_title')}
                     </h3>
                     <div className="mt-4 space-y-4">
                         <div>
-                            <InputLabel htmlFor={editingUser ? 'user-name' : 'create-user-name'} value={t('admin.users.name')} className="dark:text-gray-200" />
+                            <InputLabel htmlFor="permission-name" value={t('admin.permissions.name')} className="dark:text-gray-200" />
                             <TextInput
-                                id={editingUser ? 'user-name' : 'create-user-name'}
+                                id="permission-name"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
-                                className={inputDarkClass}
-                                autoComplete="off"
+                                className="mt-1 block w-full dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 focus:dark:border-primary-400 focus:dark:ring-primary-500"
                                 required
                             />
                             <InputError message={errors.name} className="mt-1 dark:text-red-400" />
                         </div>
                         <div>
-                            <InputLabel htmlFor={editingUser ? 'user-email' : 'create-user-email'} value={t('admin.users.email')} className="dark:text-gray-200" />
-                            <TextInput
-                                id={editingUser ? 'user-email' : 'create-user-email'}
-                                type="email"
-                                value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
-                                className={inputDarkClass}
-                                autoComplete="off"
-                                required
+                            <InputLabel htmlFor="permission-description" value={t('admin.permissions.description_label')} className="dark:text-gray-200" />
+                            <textarea
+                                id="permission-description"
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
+                                rows={3}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 focus:dark:border-primary-400 focus:dark:ring-primary-500 sm:text-sm"
                             />
-                            <InputError message={errors.email} className="mt-1 dark:text-red-400" />
-                        </div>
-                        {!editingUser && (
-                            <>
-                                <div>
-                                    <InputLabel htmlFor="create-user-password" value={t('admin.users.password')} className="dark:text-gray-200" />
-                                    <TextInput
-                                        id="create-user-password"
-                                        type="password"
-                                        value={data.password}
-                                        onChange={(e) => setData('password', e.target.value)}
-                                        className={inputDarkClass}
-                                        autoComplete="new-password"
-                                        required={!editingUser}
-                                    />
-                                    <InputError message={errors.password} className="mt-1 dark:text-red-400" />
-                                </div>
-                                <div>
-                                    <InputLabel htmlFor="user-password_confirmation" value={t('admin.users.password_confirmation')} className="dark:text-gray-200" />
-                                    <TextInput
-                                        id="create-user-password_confirmation"
-                                        type="password"
-                                        value={data.password_confirmation}
-                                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                                        className={inputDarkClass}
-                                        autoComplete="new-password"
-                                        required={!editingUser}
-                                    />
-                                    <InputError message={errors.password_confirmation} className="mt-1 dark:text-red-400" />
-                                </div>
-                            </>
-                        )}
-                        <div>
-                            <InputLabel htmlFor="user-role_id" value={t('admin.users.role')} className="dark:text-gray-200" />
-                            <select
-                                id="user-role_id"
-                                value={data.role_id}
-                                onChange={(e) => setData('role_id', e.target.value)}
-                                className={selectDarkClass}
-                                required
-                            >
-                                <option value="">{t('admin.users.select_role')}</option>
-                                {roles.map((role) => (
-                                    <option key={role.id} value={role.id}>
-                                        {role.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <InputError message={errors.role_id} className="mt-1 dark:text-red-400" />
+                            <InputError message={errors.description} className="mt-1 dark:text-red-400" />
                         </div>
                     </div>
                     <div className="mt-6 flex justify-end gap-3">
@@ -351,10 +275,10 @@ export default function UsersIndex() {
                             onClick={closeModal}
                             className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                         >
-                            {t('admin.users.cancel')}
+                            {t('admin.permissions.cancel')}
                         </button>
                         <PrimaryButton type="submit" disabled={processing}>
-                            {t('admin.users.save')}
+                            {t('admin.permissions.save')}
                         </PrimaryButton>
                     </div>
                 </form>

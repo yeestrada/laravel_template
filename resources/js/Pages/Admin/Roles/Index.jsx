@@ -8,6 +8,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 
 function PencilIcon({ className = 'h-5 w-5' }) {
     return (
@@ -41,14 +42,28 @@ function SearchIcon({ className = 'h-5 w-5' }) {
     );
 }
 
+function ShieldIcon({ className = 'h-5 w-5' }) {
+    return (
+        <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        </svg>
+    );
+}
+
 export default function RolesIndex() {
-    const { translations = {}, roles: rolesPaginator = {}, flash = {}, search: searchFromProps = '' } = usePage().props;
+    const { translations = {}, roles: rolesPaginator = {}, flash = {}, search: searchFromProps = '', per_page: perPageFromProps = 15, per_page_options: perPageOptions = [10, 15, 25, 50, 100] } = usePage().props;
     const rolesList = rolesPaginator?.data ?? [];
     const t = (key) => translations[key] ?? key;
     const flashError = flash.error;
     const [editingRole, setEditingRole] = useState(null);
     const [searchInput, setSearchInput] = useState(searchFromProps);
     const searchTimeoutRef = useRef(null);
+    const [permissionsModalOpen, setPermissionsModalOpen] = useState(false);
+    const [managingRole, setManagingRole] = useState(null);
+    const [availablePermissions, setAvailablePermissions] = useState([]);
+    const [assignedPermissions, setAssignedPermissions] = useState([]);
+    const [draggedPermission, setDraggedPermission] = useState(null);
+    const [dragSource, setDragSource] = useState(null);
 
     useEffect(() => {
         setSearchInput(searchFromProps);
@@ -114,6 +129,76 @@ export default function RolesIndex() {
         });
     };
 
+    const openPermissionsModal = async (role) => {
+        setManagingRole(role);
+        setPermissionsModalOpen(true);
+        try {
+            const response = await axios.get(route('admin.roles.permissions', role.id));
+            setAvailablePermissions(response.data.available || []);
+            setAssignedPermissions(response.data.assigned || []);
+        } catch (error) {
+            console.error('Error loading permissions:', error);
+        }
+    };
+
+    const closePermissionsModal = () => {
+        setPermissionsModalOpen(false);
+        setManagingRole(null);
+        setAvailablePermissions([]);
+        setAssignedPermissions([]);
+        setDraggedPermission(null);
+        setDragSource(null);
+    };
+
+    const handleDragStart = (e, permission, source) => {
+        setDraggedPermission(permission);
+        setDragSource(source);
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', e.target.outerHTML);
+        e.target.style.opacity = '0.5';
+    };
+
+    const handleDragEnd = (e) => {
+        e.target.style.opacity = '1';
+        setDraggedPermission(null);
+        setDragSource(null);
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    const handleDrop = (e, target) => {
+        e.preventDefault();
+        if (!draggedPermission || !dragSource || dragSource === target) return;
+
+        if (dragSource === 'available' && target === 'assigned') {
+            // Mover de disponibles a asignados
+            setAvailablePermissions(availablePermissions.filter(p => p.id !== draggedPermission.id));
+            setAssignedPermissions([...assignedPermissions, draggedPermission]);
+        } else if (dragSource === 'assigned' && target === 'available') {
+            // Mover de asignados a disponibles
+            setAssignedPermissions(assignedPermissions.filter(p => p.id !== draggedPermission.id));
+            setAvailablePermissions([...availablePermissions, draggedPermission]);
+        }
+    };
+
+    const handleSavePermissions = async () => {
+        if (!managingRole) return;
+        const permissionIds = assignedPermissions.map(p => p.id);
+        try {
+            await axios.put(route('admin.roles.permissions.update', managingRole.id), {
+                permission_ids: permissionIds,
+            });
+            closePermissionsModal();
+            router.reload({ only: ['roles'], preserveScroll: true });
+        } catch (error) {
+            console.error('Error saving permissions:', error);
+            alert(t('admin.roles.permissions_update_error'));
+        }
+    };
+
     return (
         <AuthenticatedLayout
             sidebar={<AdminSidebar />}
@@ -149,10 +234,10 @@ export default function RolesIndex() {
         >
             <Head title={t('admin.roles.title')} />
 
-            <div className="p-4 sm:p-6">
-                <div className="w-full">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800 dark:ring-1 dark:ring-gray-700">
-                        <div className="p-4 sm:p-5">
+            <div className="flex h-full min-h-0 flex-1 flex-col p-4 sm:p-6">
+                <div className="flex min-h-0 w-full flex-1">
+                    <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-lg border border-gray-300 bg-gray-100/40 shadow-sm backdrop-blur-sm dark:border-gray-600 dark:bg-gray-800/40 dark:ring-1 dark:ring-gray-700">
+                        <div className="flex min-h-0 flex-1 flex-col p-4 sm:p-5">
                             {flashError && (
                                 <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-400">
                                     {flashError}
@@ -161,7 +246,7 @@ export default function RolesIndex() {
                             <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
                                 {t('admin.roles.description')}
                             </p>
-                            <div className="overflow-x-auto">
+                            <div className="min-h-0 flex-1 overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
                                     <thead>
                                         <tr>
@@ -208,6 +293,14 @@ export default function RolesIndex() {
                                                         <div className="flex items-center justify-end gap-1">
                                                             <button
                                                                 type="button"
+                                                                onClick={() => openPermissionsModal(role)}
+                                                                title={t('admin.roles.manage_permissions')}
+                                                                className="flex items-center justify-center rounded-lg bg-blue-600 p-2 text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
+                                                            >
+                                                                <ShieldIcon />
+                                                            </button>
+                                                            <button
+                                                                type="button"
                                                                 onClick={() => openEditModal(role)}
                                                                 title={t('admin.roles.edit')}
                                                                 className="flex items-center justify-center rounded-lg bg-white p-2 text-gray-800 shadow-sm transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 dark:focus:ring-gray-500 dark:focus:ring-offset-gray-800"
@@ -233,7 +326,14 @@ export default function RolesIndex() {
                             </div>
                             {rolesPaginator?.links && (
                                 <div className="mt-4 border-t border-gray-200 px-4 py-3 dark:border-gray-600 sm:px-5">
-                                    <Pagination paginator={rolesPaginator} />
+                                    <Pagination
+                                        paginator={rolesPaginator}
+                                        perPage={perPageFromProps}
+                                        perPageOptions={perPageOptions}
+                                        routeName="admin.roles.index"
+                                        queryParams={{ search: searchInput.trim() || undefined }}
+                                        t={t}
+                                    />
                                 </div>
                             )}
                         </div>
@@ -294,6 +394,101 @@ export default function RolesIndex() {
                         </PrimaryButton>
                     </div>
                 </form>
+            </Modal>
+
+            <Modal show={permissionsModalOpen} onClose={closePermissionsModal} maxWidth="7xl">
+                <div className="flex flex-col p-6 h-[85vh] min-h-[85vh]">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex-shrink-0">
+                        {t('admin.roles.manage_permissions_title')} - {managingRole?.name}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1 min-h-0 h-full">
+                        {/* Permisos Disponibles */}
+                        <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 flex flex-col min-h-0 h-full">
+                            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex-shrink-0">
+                                {t('admin.roles.available_permissions')}
+                            </h4>
+                            <div
+                                className="flex-1 overflow-y-scroll space-y-2 pr-2 min-h-0 h-full"
+                                onDragOver={handleDragOver}
+                                onDrop={(e) => handleDrop(e, 'available')}
+                            >
+                                {availablePermissions.length === 0 ? (
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
+                                        {t('admin.roles.no_available_permissions')}
+                                    </p>
+                                ) : (
+                                    availablePermissions.map((permission) => (
+                                        <div
+                                            key={permission.id}
+                                            draggable
+                                            onDragStart={(e) => handleDragStart(e, permission, 'available')}
+                                            onDragEnd={handleDragEnd}
+                                            className="p-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg cursor-move hover:bg-gray-50 dark:hover:bg-gray-600 transition"
+                                        >
+                                            <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                                                {permission.name}
+                                            </div>
+                                            {permission.description && (
+                                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    {permission.description}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Permisos Asignados */}
+                        <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 flex flex-col min-h-0 h-full">
+                            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex-shrink-0">
+                                {t('admin.roles.assigned_permissions')}
+                            </h4>
+                            <div
+                                className="flex-1 overflow-y-scroll space-y-2 pr-2 min-h-0 h-full"
+                                onDragOver={handleDragOver}
+                                onDrop={(e) => handleDrop(e, 'assigned')}
+                            >
+                                {assignedPermissions.length === 0 ? (
+                                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
+                                        {t('admin.roles.no_assigned_permissions')}
+                                    </p>
+                                ) : (
+                                    assignedPermissions.map((permission) => (
+                                        <div
+                                            key={permission.id}
+                                            draggable
+                                            onDragStart={(e) => handleDragStart(e, permission, 'assigned')}
+                                            onDragEnd={handleDragEnd}
+                                            className="p-3 bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-700 rounded-lg cursor-move hover:bg-primary-100 dark:hover:bg-primary-900/30 transition"
+                                        >
+                                            <div className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                                                {permission.name}
+                                            </div>
+                                            {permission.description && (
+                                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                    {permission.description}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-6 flex justify-end gap-3 flex-shrink-0">
+                        <button
+                            type="button"
+                            onClick={closePermissionsModal}
+                            className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                        >
+                            {t('admin.roles.cancel')}
+                        </button>
+                        <PrimaryButton type="button" onClick={handleSavePermissions}>
+                            {t('admin.roles.save_permissions')}
+                        </PrimaryButton>
+                    </div>
+                </div>
             </Modal>
         </AuthenticatedLayout>
     );

@@ -216,7 +216,7 @@ export default function AuthenticatedLayout({ header, children, sidebar = null }
                             <img
                                 src="/images/WEC_Horsehead_Only_Black.png"
                                 alt=""
-                                className="pointer-events-none select-none absolute inset-0 mx-auto my-0 h-auto w-[60%] max-w-4xl opacity-[0.03] dark:opacity-[0.12] dark:invert"
+                                className="pointer-events-none select-none absolute inset-0 mx-auto my-0 h-auto w-[60%] max-w-4xl opacity-[0.08] dark:opacity-[0.12] dark:invert"
                             />
                             <div className="relative z-10 h-full">
                                 {children}
