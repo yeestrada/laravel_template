@@ -74,7 +74,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                         }
                         type="password"
                         className="mt-1 block w-full"
-                        autoComplete="current-password"
+                        autoComplete="off"
                     />
 
                     <InputError
