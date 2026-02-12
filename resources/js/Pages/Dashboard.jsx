@@ -17,11 +17,11 @@ export default function Dashboard() {
         >
             <Head title={t('dashboard.user.title')} />
 
-            <div className="p-4 sm:p-6">
-                <div className="w-full">
-                    <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800 dark:ring-1 dark:ring-gray-700">
-                        <div className="p-4 sm:p-5 text-gray-900 dark:text-gray-100">
-                            <p>{t('dashboard.user.welcome')}</p>
+            <div className="flex h-full min-h-0 flex-1 flex-col p-4 sm:p-6">
+                <div className="flex min-h-0 w-full flex-1">
+                    <div className="relative flex min-h-0 w-full flex-1 overflow-hidden rounded-lg border border-gray-300 bg-gray-100/40 shadow-sm backdrop-blur-sm dark:border-gray-600 dark:bg-gray-800/40 dark:ring-1 dark:ring-gray-700">
+                        <div className="relative z-10 p-4 sm:p-5 text-gray-900 dark:text-gray-100">
+                            <p className="font-medium">{t('dashboard.user.welcome')}</p>
                             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                                 {t('dashboard.user.placeholder')}
                             </p>
