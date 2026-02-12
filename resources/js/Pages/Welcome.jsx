@@ -46,9 +46,17 @@ export default function Welcome() {
                         <img
                             src="/images/WEC_Horizontal_Black.png"
                             alt={appName || t('Welcome')}
-                            className="mx-auto h-16 w-auto sm:h-20 md:h-24 object-contain object-center"
+                            className="mx-auto h-12 w-auto sm:h-16 md:h-20 object-contain object-center"
                             style={{ filter: 'brightness(0) invert(1)' }}
                         />
+                        <h1 
+                            className="font-sans font-ef-bold mt-4 text-3xl sm:text-4xl md:text-5xl text-white"
+                            style={{
+                                textShadow: '0 0 8px rgba(129, 83, 116, 0.8), 0 0 16px rgba(129, 83, 116, 0.6), 0 0 24px rgba(129, 83, 116, 0.4), 2px 2px 8px rgba(0, 0, 0, 0.5)',
+                            }}
+                        >
+                            {appName || t('app.name')}
+                        </h1>
                         <p className="font-sans font-ef-light mt-6 text-lg text-white/95 max-w-xl mx-auto leading-relaxed tracking-ef-wide">
                             {t('welcome.tagline')}
                         </p>
