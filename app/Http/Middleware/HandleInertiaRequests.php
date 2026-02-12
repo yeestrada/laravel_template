@@ -31,10 +31,29 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         $locale = app()->getLocale();
-        $langPath = lang_path($locale.'.json');
-        $translations = file_exists($langPath)
-            ? (array) json_decode(file_get_contents($langPath), true)
-            : [];
+        
+        // Load translations from PHP files
+        $translations = [];
+        
+        // Load app.php translations
+        $appLangPath = lang_path($locale.'/app.php');
+        if (file_exists($appLangPath)) {
+            $appTranslations = require $appLangPath;
+            $translations = array_merge($translations, $this->flattenTranslations($appTranslations));
+        }
+        
+        // Load pagination.php translations
+        $paginationLangPath = lang_path($locale.'/pagination.php');
+        if (file_exists($paginationLangPath)) {
+            $paginationTranslations = require $paginationLangPath;
+            $translations = array_merge($translations, $this->flattenTranslations($paginationTranslations, 'pagination'));
+        }
+        
+        // Replace :app_name placeholder with APP_NAME from config
+        $appName = config('app.name');
+        $translations = array_map(function ($value) use ($appName) {
+            return is_string($value) ? str_replace(':app_name', $appName, $value) : $value;
+        }, $translations);
 
         $errors = $request->session()->get('errors');
         $validationErrors = $errors?->getBag('default')->getMessages() ?: [];
@@ -61,5 +80,29 @@ class HandleInertiaRequests extends Middleware
             'appDebug' => config('app.debug'),
             'validationErrors' => $validationErrors,
         ];
+    }
+
+    /**
+     * Flatten nested translation array to dot notation for React compatibility.
+     *
+     * @param  array  $array
+     * @param  string  $prefix
+     * @return array
+     */
+    private function flattenTranslations(array $array, string $prefix = ''): array
+    {
+        $result = [];
+
+        foreach ($array as $key => $value) {
+            $newKey = $prefix === '' ? $key : $prefix.'.'.$key;
+
+            if (is_array($value)) {
+                $result = array_merge($result, $this->flattenTranslations($value, $newKey));
+            } else {
+                $result[$newKey] = $value;
+            }
+        }
+
+        return $result;
     }
 }
