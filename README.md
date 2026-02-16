@@ -1,12 +1,12 @@
 # Laravel Template — WEC System
 
-Laravel app with **React** (Inertia.js + Vite), **Breeze** auth, **roles & permissions**, and optional **Microsoft sign-in**. Uses **PostgreSQL** by default.
+Laravel app with **React** (Inertia.js + Vite), **Breeze** auth, **roles & permissions**, **API REST** (Sanctum), and optional **Microsoft sign-in**. Supports **PostgreSQL**, **MySQL**, or **SQLite**.
 
 ## Requirements
 
 - PHP 8.2+, Composer
 - Node.js 18+, npm
-- PostgreSQL
+- Database: PostgreSQL, MySQL, or SQLite
 - (Optional) PHP `zip` extension
 
 ## Install
@@ -14,10 +14,9 @@ Laravel app with **React** (Inertia.js + Vite), **Breeze** auth, **roles & permi
 ```bash
 cp .env.example .env
 php artisan key:generate
-# Set DB_* in .env for PostgreSQL
+# Set DB_* in .env (PostgreSQL, MySQL, or SQLite)
 
 composer install
-php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
 php artisan migrate
 
 npm install
@@ -55,6 +54,17 @@ php artisan db:seed --class=AdminUserSeeder
 
 Default admin passwords: **`admin`**. Change in production.
 
+## Testing
+
+```bash
+php artisan test
+```
+
+The project includes comprehensive tests:
+- **Feature tests**: Admin controllers (Users, Roles, Permissions), API endpoints
+- **Unit tests**: Models (User, Role, Permission)
+- **89+ tests** covering CRUD operations, validations, authorization, and security
+
 ## Deploy
 
 ```bash
@@ -63,7 +73,6 @@ cp .env.example .env && php artisan key:generate
 # Edit .env (DB_*, APP_URL)
 
 composer install --no-dev --optimize-autoloader
-php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
 php artisan migrate --force
 php artisan db:seed --class=RoleSeeder
 php artisan db:seed --class=AdminUserSeeder
@@ -78,8 +87,11 @@ php artisan config:cache && php artisan route:cache && php artisan view:cache
 |------|-------------|
 | `resources/js/Pages/` | React pages (Welcome, Dashboard, Admin: Users, Roles, Permissions) |
 | `resources/js/Layouts/` | AuthenticatedLayout, etc. |
-| `lang/en.json`, `lang/es.json` | Frontend strings (i18n) |
+| `lang/en/`, `lang/es/` | PHP translation files (app.php, auth.php, pagination.php) |
 | `config/pagination.php` | Default per-page and options for admin lists |
+| `tests/Feature/` | Feature tests (Admin controllers, API) |
+| `tests/Unit/` | Unit tests (Models) |
+| `database/factories/` | Model factories for testing |
 
 ## License
 

@@ -21,7 +21,7 @@ class AdminUserSeeder extends Seeder
             return;
         }
 
-        $adminEmails = ['admin@example.com', 'admin@wec.net'];
+        $adminEmails = ['admin@wec.net'];
         $adminPassword = Hash::make('admin');
 
         foreach ($adminEmails as $email) {
