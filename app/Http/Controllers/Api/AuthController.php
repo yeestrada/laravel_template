@@ -31,7 +31,7 @@ class AuthController extends Controller
         $token = $user->createToken('auth')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => $this->formatUser($user),
             'token' => $token,
             'token_type' => 'Bearer',
         ], 201);
@@ -61,7 +61,7 @@ class AuthController extends Controller
         $token = $user->createToken('auth')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'user' => $this->formatUser($user),
             'token' => $token,
             'token_type' => 'Bearer',
         ]);
@@ -82,6 +82,36 @@ class AuthController extends Controller
      */
     public function user(Request $request): JsonResponse
     {
-        return response()->json($request->user());
+        return response()->json($this->formatUser($request->user()));
+    }
+
+    /**
+     * Format user data for API response, excluding sensitive fields.
+     *
+     * @param  User|null  $user
+     * @return array
+     */
+    private function formatUser(?User $user): array
+    {
+        if (! $user) {
+            return [];
+        }
+
+        $user->load('role');
+
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'email_verified_at' => $user->email_verified_at,
+            'role' => $user->role ? [
+                'id' => $user->role->id,
+                'name' => $user->role->name,
+                'slug' => $user->role->slug,
+            ] : null,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+            // Explicitly exclude: password, remember_token, azure_id, etc.
+        ];
     }
 }

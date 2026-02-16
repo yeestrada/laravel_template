@@ -64,15 +64,26 @@ export default function Pagination({
                 {links.map((link, i) => {
                     const isDisabled = !link.url;
                     const isActive = link.active;
-                    const label = link.label;
+                    // Safely decode HTML entities (e.g., "&laquo;" -> "«") without allowing XSS
+                    const label = link.label
+                        ? link.label
+                              .replace(/&laquo;/g, '«')
+                              .replace(/&raquo;/g, '»')
+                              .replace(/&lt;/g, '<')
+                              .replace(/&gt;/g, '>')
+                              .replace(/&amp;/g, '&')
+                              .replace(/&quot;/g, '"')
+                              .replace(/&#39;/g, "'")
+                        : '';
 
                     if (isDisabled) {
                         return (
                             <span
                                 key={i}
                                 className="relative inline-flex cursor-not-allowed items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-500"
-                                dangerouslySetInnerHTML={{ __html: label }}
-                            />
+                            >
+                                {label}
+                            </span>
                         );
                     }
 
@@ -86,8 +97,9 @@ export default function Pagination({
                                     ? 'z-10 border-primary-500 bg-primary-50 text-primary-700 dark:border-primary-500 dark:bg-primary-500/30 dark:text-gray-100'
                                     : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
                             }`}
-                            dangerouslySetInnerHTML={{ __html: label }}
-                        />
+                        >
+                            {label}
+                        </Link>
                     );
                 })}
             </nav>
