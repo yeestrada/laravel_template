@@ -129,8 +129,10 @@ class MicrosoftAuthController extends Controller
         $user = User::where('azure_id', $azureId)->first()
             ?? User::where('email', $email)->first();
 
+        $userRole = Role::where('slug', 'user')->first();
+
         if (!$user) {
-            $userRole = Role::where('slug', 'user')->first();
+            // Create new user with default "user" role
             $user = User::create([
                 'name' => $name,
                 'email' => $email,
@@ -140,11 +142,24 @@ class MicrosoftAuthController extends Controller
                 'role_id' => $userRole?->id,
             ]);
         } else {
+            // Update existing user
+            $updates = [];
+            
             if (empty($user->azure_id)) {
-                $user->update(['azure_id' => $azureId]);
+                $updates['azure_id'] = $azureId;
             }
+            
             if (empty($user->email_verified_at)) {
-                $user->update(['email_verified_at' => now()]);
+                $updates['email_verified_at'] = now();
+            }
+            
+            // Assign default "user" role if user doesn't have a role
+            if (empty($user->role_id) && $userRole) {
+                $updates['role_id'] = $userRole->id;
+            }
+            
+            if (!empty($updates)) {
+                $user->update($updates);
             }
         }
 
